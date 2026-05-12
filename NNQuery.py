@@ -7,7 +7,7 @@
 
 import sys
 import math
-import heapq
+import heapq #gia priority queue
 
 
 def diavase_dentro(path):
@@ -102,31 +102,32 @@ def knn_query(oloi_oi_komboi, riza_id, qx, qy, k):
     # Kathe simeio pou vgainei apo tin oura einai o epomenos NN
     # Stamatame otan exoume k apotelesmata
 
-    heap  = []
-    monot = [0]   # monotonika auxanomenos gia disambiguation tou heapq
+    heap  = []    #priority queue
+    monot = [0]   # metriths pou auksanete kathe fora pou vazw kati sto heap kai xreiazetai gia na min 
+    #mperdeuetai to heapq otan 2 stoixeia exoun idia apostasi
 
-    def push_node(nid, dist):
-        monot[0] = monot[0] + 1
+    def push_node(nid, dist): #(dist, monot, 0, nid) endiamesos komvos
+        monot[0] = monot[0] + 1 # metrhths kathe fora pou vazw kati sto heap ayksanete
         heapq.heappush(heap, (dist, monot[0], 0, nid))
 
-    def push_simeio(rid, dist):
+    def push_simeio(rid, dist): #(dist, monot, 1, nid) shmainei shmeio
         monot[0] = monot[0] + 1
         heapq.heappush(heap, (dist, monot[0], 1, rid))
 
     # Balo tin riza me apostasi 0.0 (pantote to prwto pou tha vgei)
     push_node(riza_id, 0.0)
 
-    apotelesmata = []   # rids twn k NN me ti seira pou vgainoun
+    apotelesmata = []   # record-ids twn k NN me ti seira pou vgainoun
 
-    while len(heap) > 0 and len(apotelesmata) < k:
-        d, _, typos, eid = heapq.heappop(heap)
-
+    while len(heap) > 0 and len(apotelesmata) < k: #oso exw pragmata na eksereunisw kai den exw vrei k shmeia synexizw 
+        d, _, typos, eid = heapq.heappop(heap) #to heap mou dinei to stoixeio me thn mikroterh dist
+        #to eid einai an typos=0->node-id an typos=1->redord-id
         if typos == 1:
             # Simeio: einai o epomenos plisiesteros geitonas
             apotelesmata.append(eid)
         else:
             # Kombos: ton eksereynw prostethontas ta paidia/simeia tou ston heap
-            kombos = oloi_oi_komboi[eid]
+            kombos = oloi_oi_komboi[eid] # anoigw ton komvo me eid na einai edw node-id
 
             if kombos["is_leaf"]:
                 # Fyllo: prosthetw ola ta simeia tou me tin pragmatiki apostasi tous
@@ -135,14 +136,16 @@ def knn_query(oloi_oi_komboi, riza_id, qx, qy, k):
                     x    = entry[1][0]
                     y    = entry[1][1]
                     dist = math.sqrt((x - qx) * (x - qx) + (y - qy) * (y - qy))
-                    push_simeio(rid, dist)
+                    push_simeio(rid, dist) #to vazw sto heap ws shmeio 
+                    #den to vazw kateutheian sta apotelesmata giati mporei na yparxei allo shmeio 
+                    #apo allo fyllo pou einai pio konta. ara ta vazw heap na apofasisei poio vgenei prwto
             else:
                 # Endiamesos: prosthetw ta paidia tou me tin MINDIST tous
                 for entry in kombos["entries"]:
                     child_id  = entry[0]
                     child_mbr = entry[1]
-                    d_child   = min_dist_simeio_mbr(qx, qy, child_mbr)
-                    push_node(child_id, d_child)
+                    d_child   = min_dist_simeio_mbr(qx, qy, child_mbr) # ypologizw MINDIST apo to query point sto MBR toy paidiou
+                    push_node(child_id, d_child) #vazw to paidi sto heap ws komvo
 
     return apotelesmata
 

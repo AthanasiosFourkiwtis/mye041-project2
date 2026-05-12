@@ -63,7 +63,7 @@ def diavase_dentro(path):
     return oloi_oi_komboi
 
 
-def min_dist_simeio_mbr(qx, qy, mbr):
+def min_dist_simeio_mbr(qx, qy, mbr): #epistrefei thn elaxisth dynath apostash apo to query point mexri to MBR
     # Elaxisti apostasi apo to simeio (qx,qy) pros to MBR [xl,yl,xh,yh]
     # Vriskw to eggytero simeio panw sto MBR kai ypologizw tin apostasi
 
@@ -90,7 +90,7 @@ def min_dist_simeio_mbr(qx, qy, mbr):
 
     dx = qx - cx
     dy = qy - cy
-    return math.sqrt(dx * dx + dy * dy)
+    return math.sqrt(dx * dx + dy * dy)  #ypologizw eykleidia apostash
 
 
 def distance_query(oloi_oi_komboi, riza_id, qx, qy, r):
@@ -111,7 +111,7 @@ def distance_query(oloi_oi_komboi, riza_id, qx, qy, r):
                 x   = entry[1][0]
                 y   = entry[1][1]
                 dist = math.sqrt((x - qx) * (x - qx) + (y - qy) * (y - qy))
-                if dist <= r:
+                if dist <= r: #an h apostash mikroterh h isi apo aktina karatw to record-id 
                     apotelesmata.append(rid)
         else:
             # Endiamesos: elegxw an to MBR kathe paidiou temnei tin sfaira aposatsis r

@@ -6,7 +6,7 @@
 import sys
 
 
-def diavase_dentro(path):
+def diavase_dentro(path):  #ksanaxtizei to R-tree apo to csv se morfh listas komvwn
     # diavazo to rtree.csv kai ftianxw ton pinaka oloi_oi_komboi
     # o pinkas einai indexed by node_id (thesi = id, opws sto Rtree.py)
 
@@ -14,7 +14,7 @@ def diavase_dentro(path):
     grammes = f.readlines()
     f.close()
 
-    oloi_oi_komboi = []
+    oloi_oi_komboi = [] #apothikevw olous tous komvous pou diavazw
 
     for grammi in grammes:
         grammi = grammi.strip()
@@ -47,18 +47,21 @@ def diavase_dentro(path):
 
             # Vriskw to prwto koma gia na xwrisw ptr apo geo
             # px "42474,(39.74118, 116.070466)" -> prwto koma sti thesi 5
-            prwto_koma = entry_str.index(",") # vazw index(",") kai oxi find(",") gt xerw oti yparxei komma kai an den yphrxe protimw na skasei to programma apo to na synexisei me lathos dedomena
+            prwto_koma = entry_str.index(",") # vazw index(",") kai oxi find(",") gt xerw oti yparxei komma kai an den yphrxe protimw na skasei 
+            #to programma apo to na synexisei me lathos dedomena
             ptr     = int(entry_str[:prwto_koma]) # ola ta grammata prin to prwto komma kai me to int ginete metatropi se akeraio
+            #ptr -> record-id an eisai se fyllo kai child-node-id an eisai se endiameso komvo
             geo_str = entry_str[prwto_koma + 1:].strip() #ola ta grammata meta to prwto komma
+            #gep_str -> point an eisai se fyllo, MBR an eisai se endiameso
 
             if is_leaf:
                 # geo_str = "(39.74118, 116.070466)"
                 # Vgazw parenth kai kano split me ", "
                 geo_str = geo_str[1:-1]          # "39.74118, 116.070466"
-                coords  = geo_str.split(", ")
-                x = float(coords[0]) #metatrepw strings se arithmous
+                coords  = geo_str.split(", ") # xwrizw tis 2 syntetagmenes px ["39.74118", "116.070466"]
+                x = float(coords[0]) #metatrepw strings(syntetagmenes) se arithmous
                 y = float(coords[1])
-                entries.append((ptr, (x, y)))
+                entries.append((ptr, (x, y))) #prosthetw tin eggrafi se fyllo edw to ptr einai redord-id ara vazw (record-id, (x,y))
             else:
                 # geo_str = "[39.682541, 116.070466, 39.74118, 116.119867]"
                 # Vgazw agkistres kai kano split me ", "
@@ -67,15 +70,16 @@ def diavase_dentro(path):
                 xl = float(coords[0])
                 yl = float(coords[1])
                 xh = float(coords[2])
-                yh = float(coords[3])
-                entries.append((ptr, [xl, yl, xh, yh]))
+                yh = float(coords[3])  #pairnw ta oria tou MBR
+                entries.append((ptr, [xl, yl, xh, yh])) #prosthetw thn eggrafi kai edw to ptr einai child-node-id
+                # ara vazw (child-id, [x_low, y_low, x_high, y_high])
 
-        kombos = {
+        kombos = {                   #dhmiourgw dictionary gia ton komvo
             "node_id" : node_id,
             "is_leaf" : is_leaf,
             "entries" : entries
         }
-        oloi_oi_komboi.append(kombos)
+        oloi_oi_komboi.append(kombos) #vazw ton komvo sthn lista olwn twn komvwn
 
     return oloi_oi_komboi
 
@@ -113,8 +117,8 @@ def window_query(oloi_oi_komboi, riza_id, W):
     # me STIVA (DFS) apo tin riza
     # Epistrefw lista me ola ta record_ids pou vrethikan mesa sto parathiro W
 
-    apotelesmata = []
-    stiva = [riza_id] #xekinaw apo thn riza
+    apotelesmata = [] #vazw record-ids pou einai apanthseis
+    stiva = [riza_id] #xekinaw apo thn riza kai xrhsimopoiw stack ara kanw DFS
 
     while len(stiva) > 0:
         nid    = stiva.pop()           # pairno ton epomeno komvo apo tin stiva
@@ -140,7 +144,7 @@ def window_query(oloi_oi_komboi, riza_id, W):
     return apotelesmata
 
 
-def diavase_queries(path):
+def diavase_queries(path): #diavazei kathe parathyro apo to arxeio queries kai to apothikevei ws [x_low, y_low, x_high, y_high]
     # Diavazo to arxeio me ta window queries
     # Kathe grammi: "x_low y_low x_high y_high" (4 floats me keno metaksy tous)
 
